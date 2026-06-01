@@ -1,7 +1,7 @@
 """
 LatentFactorRouter LiteLLM integration.
 
-Wraps SuperClaw's LatentFactorRouter as a LiteLLM CustomLogger pre-routing hook,
+    Wraps the vendored LatentFactorRouter as a LiteLLM CustomLogger pre-routing hook,
 following the same pattern as ComplexityRouter.
 """
 
@@ -24,7 +24,7 @@ else:
 
 class LatentFactorRouterLiteLLM(CustomLogger):
     """
-    LiteLLM pre-routing hook backed by SuperClaw's LatentFactorRouter.
+    LiteLLM pre-routing hook backed by the vendored LatentFactorRouter.
 
     Prerequisites:
       1. A trained artefacts bundle (.pkl) must exist at config.artefacts_path.
@@ -32,8 +32,8 @@ class LatentFactorRouterLiteLLM(CustomLogger):
          (default: http://127.0.0.1:18104/v1). Configure via config.yaml_path YAML.
       3. Model names in the artefacts (e.g. "gpt-4o") must match model_name
          entries in LiteLLM's model_list. Mismatches cause silent fallback.
-      4. The SuperClaw repo root must be on sys.path so that
-         `custom_routers.latentfactorrouter.router` is importable.
+      4. The vendored router module must be importable from this package;
+         optional extras may still be required for the underlying model code.
 
     Usage:
         config = LatentFactorRouterConfig(
@@ -57,20 +57,20 @@ class LatentFactorRouterLiteLLM(CustomLogger):
 
     def _get_router(self) -> Any:
         """
-        Lazily initialize the SuperClaw LatentFactorRouter.
+        Lazily initialize the vendored LatentFactorRouter.
 
         Returns the router instance, or None if initialization fails
-        (artefacts missing, SuperClaw not importable, etc.).
+        (artefacts missing, vendored router import fails, etc.).
         """
         if self._router is not None:
             return self._router
 
         try:
-            from custom_routers.latentfactorrouter.router import LatentFactorRouter  # type: ignore
+            from .router import LatentFactorRouter
         except ImportError:
             verbose_router_logger.warning(
-                "[LatentFactorRouterLiteLLM] SuperClaw LatentFactorRouter not importable. "
-                "Ensure the SuperClaw repo root is on sys.path."
+                "[LatentFactorRouterLiteLLM] Vendored LatentFactorRouter not importable. "
+                "Ensure litellm.router_strategy.latent_factor_router is installed with its optional extras."
             )
             return None
 
