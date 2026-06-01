@@ -122,6 +122,15 @@ proxy-runtime = [
     "llm-sandbox==0.3.39",
     "detect-secrets==1.5.0",
 ]
+superclaw_routers = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "openai>=1.0",
+    "tiktoken>=0.5",
+    "tqdm>=4.0",
+    "pyyaml>=6.0",
+]
 
 [project.scripts]
 litellm = "litellm:run_server"
